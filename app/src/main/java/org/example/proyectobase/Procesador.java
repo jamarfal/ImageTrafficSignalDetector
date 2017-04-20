@@ -18,7 +18,7 @@ public class Procesador {
 
     public enum Salida {ENTRADA, INTENSIDAD, OPERADOR_LOCAL, BINARIZACION, SEGMENTACION, RECONOCIMIENTO}
 
-    public enum TipoIntensidad {SIN_PROCESO, LUMINANCIA, AUMENTO_LINEAL_CONSTANTE, EQUALIZ_HISTOGRAMA, ZONAS_ROJAS}
+    public enum TipoIntensidad {SIN_PROCESO, LUMINANCIA, AUMENTO_LINEAL_CONSTRASTE, EQUALIZ_HISTOGRAMA, ZONAS_ROJAS}
 
     public enum TipoOperadorLocal {SIN_PROCESO, PASO_BAJO, PASO_ALTO, GRADIENTES}
 
@@ -65,9 +65,9 @@ public class Procesador {
                 Imgproc.cvtColor(entrada, salidaintensidad, Imgproc.COLOR_RGBA2GRAY);
                 break;
 
-            case AUMENTO_LINEAL_CONSTANTE:
+            case AUMENTO_LINEAL_CONSTRASTE:
                 Imgproc.cvtColor(entrada, gris, Imgproc.COLOR_RGBA2GRAY);
-                aumentoLinealConstante(gris); //resultado en salidaintensidad
+                aumentoLinealContraste(gris); //resultado en salidaintensidad
                 break;
             case EQUALIZ_HISTOGRAMA:
                 Imgproc.cvtColor(entrada, gris, Imgproc.COLOR_RGBA2GRAY); //Eq. Hist necesita gris
@@ -136,7 +136,7 @@ public class Procesador {
         salidaintensidad = entrada;
     }
 
-    void aumentoLinealConstante(Mat entrada) {//Ejemplo para ser rellenada en curso
+    void aumentoLinealContraste(Mat entrada) {//Ejemplo para ser rellenada en curso
         salidaintensidad = entrada;
     }
 

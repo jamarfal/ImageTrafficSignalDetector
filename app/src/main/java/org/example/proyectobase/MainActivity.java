@@ -2,10 +2,13 @@ package org.example.proyectobase;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -36,6 +39,7 @@ import java.io.File;
 public class MainActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2,
         LoaderCallbackInterface {
 
+    private boolean pantallaPartida = false;
     private static final int SOLICITUD_PERMISO_CAMERA = 0;
     private static final String STATE_CAMERA_INDEX = "cameraIndex";
 
@@ -127,6 +131,10 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             case R.id.guardar_imagenes:
                 guardarSiguienteImagen = true;
                 break;
+            case R.id.preferencias:
+                Intent i = new Intent(this, Preferencias.class);
+                startActivity(i);
+                break;
 
         }
         String msg = "W=" + Integer.toString(cam_anchura) + " H= " +
@@ -206,6 +214,21 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         procesador = new Procesador();
         cam_altura = height; //Estas son las que se usan de verdad
         cam_anchura = width;
+        PreferenceManager.setDefaultValues(this, R.xml.preferencias, false);
+        SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(this);
+        pantallaPartida = (preferencias.getBoolean("pantalla_partida", true));
+        String valor = preferencias.getString("salida", "ENTRADA");
+        procesador.setMostrarSalida(Procesador.Salida.valueOf(valor));
+        valor = preferencias.getString("intensidad", "SIN_PROCESO");
+        procesador.setTipoIntensidad(Procesador.TipoIntensidad.valueOf(valor));
+        valor = preferencias.getString("operador_local", "SIN_PROCESO");
+        procesador.setTipoOperadorLocal(Procesador.TipoOperadorLocal.valueOf(valor));
+        valor = preferencias.getString("binarizacion", "SIN_PROCESO");
+        procesador.setTipoBinarizacion(Procesador.TipoBinarizacion.valueOf(valor));
+        valor = preferencias.getString("segmentacion", "SIN_PROCESO");
+        procesador.setTipoSegmentacion(Procesador.TipoSegmentacion.valueOf(valor));
+        valor = preferencias.getString("reconocimiento", "SIN_PROCESO");
+        procesador.setTipoReconocimiento(Procesador.TipoReconocimiento.valueOf(valor));
     }
 
     public void onCameraViewStopped() {
