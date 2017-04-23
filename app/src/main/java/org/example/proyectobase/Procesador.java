@@ -32,10 +32,9 @@ public class Procesador {
         Mat ModGrad = new Mat();
         Mat AngGrad = new Mat();
 
-        Core.cartToPolar( Gx , Gy , ModGrad, AngGrad);
+        Core.cartToPolar(Gx, Gy, ModGrad, AngGrad);
 
 
-        Mat salida = entrada.clone();
-        return salida;
+        return ModGrad;
     }
 }
