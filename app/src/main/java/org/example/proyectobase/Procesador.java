@@ -17,23 +17,29 @@ import java.util.List;
  */
 
 public class Procesador {
+
+    private final Mat Gx;
+    private final Mat Gy;
+    private final Mat ModGrad;
+    private final Mat AngGrad;
+
     public Procesador() { //Constructor
+        Gx = new Mat();
+        Gy = new Mat();
+        ModGrad = new Mat();
+        AngGrad = new Mat();
     }
 
     public Mat procesa(Mat entrada) {
 
-        // Mat original
-        Mat Gx = new Mat();
-        Mat Gy = new Mat();
-
+        // Derivadas
         Imgproc.Sobel(entrada, Gx, CvType.CV_32FC1, 1, 0); //Derivada primera rto x
         Imgproc.Sobel(entrada, Gy, CvType.CV_32FC1, 0, 1); //Derivada primera rto y
 
-        Mat ModGrad = new Mat();
-        Mat AngGrad = new Mat();
-
+        // Módulo de Gradiente
         Core.cartToPolar(Gx, Gy, ModGrad, AngGrad);
 
+        ModGrad.convertTo(Gx, CvType.CV_8UC1);
 
         return ModGrad;
     }
