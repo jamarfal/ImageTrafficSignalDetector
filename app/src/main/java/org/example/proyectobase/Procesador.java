@@ -6,6 +6,7 @@ import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class Procesador {
     Mat hist;
     List<Mat> imagenes;
     float[] histograma;
+    Mat paso_bajo;
 
     Procesador() {
         canales = new MatOfInt(0);
@@ -31,53 +33,20 @@ public class Procesador {
         hist = new Mat();
         imagenes = new ArrayList<Mat>();
         histograma = new float[256];
+        paso_bajo= new Mat();
     }
 
     public Mat procesa(Mat entrada) {
         Mat salida = new Mat();
-        imagenes.clear(); //Eliminar imagen anterior si la hay
-        imagenes.add(entrada); //Añadir imagen actual
-        Imgproc.calcHist(imagenes, canales, new Mat(), hist,
-                numero_bins, intervalo);
-//Lectura del histograma a un array de float
-        hist.get(0, 0, histograma);
-//Calcular xmin y xmax
-        int total_pixeles = entrada.cols() * entrada.rows();
-        float porcentaje_saturacion = (float) 0.05;
-        int pixeles_saturados = (int) (porcentaje_saturacion * total_pixeles);
-        int xmin = 0;
-        int xmax = 255;
-        float acumulado = 0f;
-        for (int n = 0; n < 256; n++) { //xmin
-            acumulado = acumulado + histograma[n];
-            if (acumulado > pixeles_saturados) {
-                xmin = n;
-                break;
-            }
-        }
-        acumulado = 0;
-        for (int n = 255; n >= 0; n--) { //xmax
-            acumulado = acumulado + histograma[n];
-            if (acumulado > pixeles_saturados) {
-                xmax = n;
-                break;
-            }
-        }
-//Calculo de la salida
-        Core.subtract(entrada, new Scalar(xmin), salida);
-        float pendiente = ((float) 255.0) / ((float) (xmax - xmin));
-        Core.multiply(salida, new Scalar(pendiente), salida);
+        int filter_size = 17;
+        Size s=new Size(filter_size,filter_size);
+        Imgproc.blur(entrada, paso_bajo, s);
+// Hacer la resta. Los valores negativos saturan a cero
+        Core.subtract(paso_bajo, entrada, salida);
+//Aplicar Ganancia para ver mejor. La multiplicacion satura
+        Scalar ganancia = new Scalar(2);
+        Core.multiply(salida, ganancia, salida);
         return salida;
     }
 
-    void mitadMitad(Mat entrada, Mat salida) {
-//Representar la entrada en la mitad izquierda
-        Rect mitad_izquierda = new Rect();
-        mitad_izquierda.x = 0; mitad_izquierda.y = 0;
-        mitad_izquierda.height = entrada.height();
-        mitad_izquierda.width = entrada.width()/2;
-        Mat salida_mitad_izquierda = salida.submat( mitad_izquierda );
-        Mat entrada_mitad_izquierda = entrada.submat( mitad_izquierda );
-        entrada_mitad_izquierda.copyTo(salida_mitad_izquierda);
-    }
 }
