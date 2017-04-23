@@ -13,6 +13,8 @@ import java.util.List;
 
 /**
  * Created by jamarfal on 19/4/17.
+ *
+ * Aumento Lineal de Contraste
  */
 
 public class Procesador {
