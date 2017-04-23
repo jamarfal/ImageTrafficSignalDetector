@@ -242,6 +242,8 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             //Es necesario que el tamaño de la salida coincida con el real de captura
             Imgproc.resize(salida, salida, new Size(cam_anchura, cam_altura));
         }
+        if (salida.channels() == 1)
+            Imgproc.cvtColor(salida, salida, Imgproc.COLOR_GRAY2RGBA);
         return salida;
 
 
