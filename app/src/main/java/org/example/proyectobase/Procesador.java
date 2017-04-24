@@ -39,7 +39,7 @@ public class Procesador {
         // Módulo de Gradiente
         Core.cartToPolar(Gx, Gy, ModGrad, AngGrad);
 
-        ModGrad.convertTo(Gx, CvType.CV_8UC1);
+        ModGrad.convertTo(ModGrad, CvType.CV_8UC1);
 
         return ModGrad;
     }
