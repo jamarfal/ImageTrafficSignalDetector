@@ -21,7 +21,7 @@ public class Procesador {
     }
 
     public Mat procesa(Mat entrada) {
-        double tam = 3;
+        double tam = 11;
 
         // Elemento estructurante
         Mat SE = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(tam, tam));
