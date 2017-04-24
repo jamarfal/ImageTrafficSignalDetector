@@ -6,6 +6,7 @@ import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -18,8 +19,18 @@ import java.util.List;
 public class Procesador {
     public Procesador() { //Constructor
     }
+
     public Mat procesa(Mat entrada) {
-        Mat salida = entrada.clone();
-        return salida;
+        double tam = 3;
+
+        // Elemento estructurante
+        Mat SE = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(tam, tam));
+        // Dilatación
+        Mat gray_dilation = new Mat(); // Result
+        Imgproc.dilate(entrada, gray_dilation, SE); // 3x3 dilation
+        // Cálculo del residuo
+        Mat dilation_residue = new Mat();
+        Core.subtract(gray_dilation, entrada, dilation_residue);
+        return dilation_residue;
     }
 }
