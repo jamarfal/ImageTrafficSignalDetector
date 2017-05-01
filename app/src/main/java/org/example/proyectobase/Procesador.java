@@ -20,7 +20,7 @@ public class Procesador {
         maxGB = new Mat();
         maxRB = new Mat();
     }
-    public Mat procesa(Mat entrada) {
+    public Mat procedaRed(Mat entrada) {
         Mat salida = new Mat();
         Core.extractChannel(entrada, red, 0);
         Core.extractChannel(entrada, green, 1);
