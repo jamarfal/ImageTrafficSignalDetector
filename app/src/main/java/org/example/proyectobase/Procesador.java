@@ -18,8 +18,10 @@ import java.util.List;
 public class Procesador {
     public Procesador() { //Constructor
     }
+
     public Mat procesa(Mat entrada) {
         Mat salida = entrada.clone();
+        Imgproc.threshold(entrada, salida, 0, 255, Imgproc.THRESH_OTSU | Imgproc.THRESH_BINARY);
         return salida;
     }
 }
