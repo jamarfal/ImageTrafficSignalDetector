@@ -31,6 +31,12 @@ public class Procesador {
         // Cálculo del residuo
         Mat dilation_residue = new Mat();
         Core.subtract(gray_dilation, entrada, dilation_residue);
+
+        //Calculo del gradiente morfológico.
+        int contraste = 2;
+        int tamano = 7;
+        Imgproc.adaptiveThreshold(gray_dilation, dilation_residue,255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+                Imgproc.THRESH_BINARY, tamano, -contraste );
         return dilation_residue;
     }
 }
