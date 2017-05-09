@@ -232,7 +232,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             entrada = imagenRecurso_;
         }
 
-        Mat salida = procesador.procedaRed(entrada);
+        Mat salida = procesador.procesaGreen(entrada);
 
         if (guardarSiguienteImagen) {//Para foto salida debe ser rgba
             takePhoto(entrada, salida);
