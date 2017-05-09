@@ -29,7 +29,7 @@ public class Procesador {
 
     public enum TipoIntensidad {SIN_PROCESO, LUMINANCIA, AUMENTO_LINEAL_CONSTRASTE, EQUALIZ_HISTOGRAMA, ZONAS_ROJAS}
 
-    public enum TipoOperadorLocal {SIN_PROCESO, PASO_BAJO, PASO_ALTO, GRADIENTES}
+    public enum TipoOperadorLocal {SIN_PROCESO, PASO_BAJO, PASO_ALTO, GRADIENTES, MORFOLOGICO_3, MORFOLOGICO_11}
 
     public enum TipoBinarizacion {SIN_PROCESO, ADAPTATIVA, MAXIMO}
 
@@ -151,6 +151,12 @@ public class Procesador {
             case GRADIENTES:
                 sobel(salidaintensidad);
                 break;
+            case MORFOLOGICO_3:
+                gradienteMorfolico(3, salidaintensidad);
+                break;
+
+            case MORFOLOGICO_11:
+                break;
         }
 
         if (mostrarSalida == Salida.OPERADOR_LOCAL) {
@@ -190,8 +196,6 @@ public class Procesador {
         }
         return salidaocr;
     }
-
-
 
 
     void zonaRoja(Mat entrada) { //Ejemplo para ser rellenada en curso
@@ -261,6 +265,24 @@ public class Procesador {
         Core.cartToPolar(Gx, Gy, salidatrlocal, AngGrad);
 
         salidatrlocal.convertTo(salidatrlocal, CvType.CV_8UC1);
+
+    }
+
+    private void gradienteMorfolico(int tam, Mat entrada) {
+
+        // Elemento estructurante
+        Mat SE = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(tam, tam));
+        // Dilatación
+        Mat gray_dilation = new Mat(); // Result
+        Imgproc.dilate(entrada, gray_dilation, SE); // 3x3 dilation
+        // Cálculo del residuo
+        Core.subtract(gray_dilation, entrada, salidatrlocal);
+
+        //Calculo del gradiente morfológico.
+        int contraste = 2;
+        int tamano = 7;
+        Imgproc.adaptiveThreshold(gray_dilation, salidatrlocal, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+                Imgproc.THRESH_BINARY, tamano, -contraste);
 
     }
 

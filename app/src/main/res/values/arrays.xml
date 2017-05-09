@@ -34,12 +34,16 @@
         <item>Filtro Paso Bajo</item>
         <item>Filtro Paso Alto</item>
         <item>Filtro Sobel</item>
+        <item>Morfológico 3x3</item>
+        <item>Morfológico 11x11</item>
     </string-array>
     <string-array name="valorOperadorLocal">
         <item>SIN_PROCESO</item>
         <item>PASO_BAJO</item>
         <item>PASO_ALTO</item>
         <item>GRADIENTES</item>
+        <item>MORFOLOGICO_3</item>
+        <item>MORFOLOGICO_11</item>
     </string-array>
     <string-array name="tipoBinarizacion">
         <item>Sin proceso</item>
