@@ -123,7 +123,7 @@ public class Procesador {
                 aumentoLinealContraste(gris); //resultado en salidaintensidad
                 break;
             case EQUALIZ_HISTOGRAMA:
-                Imgproc.cvtColor(entrada, gris, Imgproc.COLOR_RGBA2GRAY); //Eq. Hist necesita gris
+                //Imgproc.cvtColor(entrada, gris, Imgproc.COLOR_RGBA2GRAY); //Eq. Hist necesita gris
                 Imgproc.equalizeHist(gris, salidaintensidad);
                 break;
             case ZONAS_ROJAS:
@@ -152,10 +152,13 @@ public class Procesador {
                 sobel(salidaintensidad);
                 break;
             case MORFOLOGICO_3:
+
                 gradienteMorfolico(3, salidaintensidad);
                 break;
 
             case MORFOLOGICO_11:
+
+                gradienteMorfolico(11, salidaintensidad);
                 break;
         }
 
@@ -276,13 +279,15 @@ public class Procesador {
         Mat gray_dilation = new Mat(); // Result
         Imgproc.dilate(entrada, gray_dilation, SE); // 3x3 dilation
         // Cálculo del residuo
-        Core.subtract(gray_dilation, entrada, salidatrlocal);
+        Mat dilation_residue = new Mat();
+        Core.subtract(gray_dilation, entrada, dilation_residue);
 
         //Calculo del gradiente morfológico.
         int contraste = 2;
         int tamano = 7;
-        Imgproc.adaptiveThreshold(gray_dilation, salidatrlocal, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
-                Imgproc.THRESH_BINARY, tamano, -contraste);
+        Imgproc.adaptiveThreshold(gray_dilation, dilation_residue,255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+                Imgproc.THRESH_BINARY, tamano, -contraste );
+        salidatrlocal = dilation_residue.clone();
 
     }
 
