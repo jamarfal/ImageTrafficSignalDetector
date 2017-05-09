@@ -71,7 +71,7 @@ public class Procesador {
                 continue;
 // Aqui cumple todos los criterios. Dibujamos
             final Point P1 = new Point(BB.x, BB.y);
-            final Point P2 = new Point(BB.x+BB.width, BB.y+BB.height);
+            final Point P2 = new Point(BB.x+BB.width-1, BB.y+BB.height-1);
             Imgproc.rectangle(salida, P1, P2, new Scalar(255,0,0) );
         } // for
         return salida;
