@@ -32,10 +32,14 @@
     <string-array name="tipoOperadorLocal">
         <item>Sin proceso</item>
         <item>Filtro Paso Bajo</item>
+        <item>Filtro Paso Alto</item>
+        <item>Filtro Sobel</item>
     </string-array>
     <string-array name="valorOperadorLocal">
         <item>SIN_PROCESO</item>
         <item>PASO_BAJO</item>
+        <item>PASO_ALTO</item>
+        <item>GRADIENTES</item>
     </string-array>
     <string-array name="tipoBinarizacion">
         <item>Sin proceso</item>

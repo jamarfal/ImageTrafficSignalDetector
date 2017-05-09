@@ -1,7 +1,16 @@
 package org.example.proyectobase;
 
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
+import org.opencv.core.MatOfInt;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jamarfal on 19/4/17.
@@ -35,6 +44,30 @@ public class Procesador {
     private TipoSegmentacion tipoSegmentacion;
     private TipoReconocimiento tipoReconocimiento;
 
+
+    // Aumento Lineal Contraste
+    MatOfInt canales;
+    MatOfInt numero_bins;
+    MatOfFloat intervalo;
+    Mat hist;
+    List<Mat> imagenes;
+    float[] histograma;
+
+    // Detección Zonas rojas
+    Mat red;
+    Mat green;
+    Mat blue;
+    Mat maxGB;
+    Mat maxRB;
+
+    // Paso Alto
+    Mat paso_bajo;
+
+    // Modulo Gradiente Sobel
+    private final Mat Gx;
+    private final Mat Gy;
+    private final Mat AngGrad;
+
     public Procesador() {
         mostrarSalida = Salida.INTENSIDAD;
         tipoIntensidad = TipoIntensidad.LUMINANCIA;
@@ -48,6 +81,26 @@ public class Procesador {
         salidasegmentacion = new Mat();
         salidaocr = new Mat();
         gris = new Mat();
+
+        canales = new MatOfInt(0);
+        numero_bins = new MatOfInt(256);
+        intervalo = new MatOfFloat(0, 256);
+        hist = new Mat();
+        imagenes = new ArrayList<Mat>();
+        histograma = new float[256];
+
+
+        red = new Mat();
+        green = new Mat();
+        blue = new Mat();
+        maxGB = new Mat();
+        maxRB = new Mat();
+
+        paso_bajo = new Mat();
+
+        Gx = new Mat();
+        Gy = new Mat();
+        AngGrad = new Mat();
     }
 
     public Mat procesa(Mat entrada) {
@@ -92,6 +145,12 @@ public class Procesador {
             case PASO_BAJO:
                 pasoBajo(salidaintensidad); //resultado en salidatrlocal
                 break;
+            case PASO_ALTO:
+                Imgproc.cvtColor(entrada, gris, Imgproc.COLOR_RGBA2GRAY);
+                pasoAlto(salidaintensidad);
+            case GRADIENTES:
+                sobel(salidaintensidad);
+                break;
         }
 
         if (mostrarSalida == Salida.OPERADOR_LOCAL) {
@@ -132,16 +191,77 @@ public class Procesador {
         return salidaocr;
     }
 
+
+
+
     void zonaRoja(Mat entrada) { //Ejemplo para ser rellenada en curso
-        salidaintensidad = entrada;
+        Core.extractChannel(entrada, red, 0);
+        Core.extractChannel(entrada, green, 1);
+        Core.extractChannel(entrada, blue, 2);
+        Core.max(green, blue, maxGB);
+        Core.subtract(red, maxGB, salidaintensidad);
     }
 
     void aumentoLinealContraste(Mat entrada) {//Ejemplo para ser rellenada en curso
-        salidaintensidad = entrada;
+        imagenes.clear(); //Eliminar imagen anterior si la hay
+        imagenes.add(entrada); //Añadir imagen actual
+        Imgproc.calcHist(imagenes, canales, new Mat(), hist,
+                numero_bins, intervalo);
+//Lectura del histograma a un array de float
+        hist.get(0, 0, histograma);
+//Calcular xmin y xmax
+        int total_pixeles = entrada.cols() * entrada.rows();
+        float porcentaje_saturacion = (float) 0.05;
+        int pixeles_saturados = (int) (porcentaje_saturacion * total_pixeles);
+        int xmin = 0;
+        int xmax = 255;
+        float acumulado = 0f;
+        for (int n = 0; n < 256; n++) { //xmin
+            acumulado = acumulado + histograma[n];
+            if (acumulado > pixeles_saturados) {
+                xmin = n;
+                break;
+            }
+        }
+        acumulado = 0;
+        for (int n = 255; n >= 0; n--) { //xmax
+            acumulado = acumulado + histograma[n];
+            if (acumulado > pixeles_saturados) {
+                xmax = n;
+                break;
+            }
+        }
+//Calculo de la salida
+        Core.subtract(entrada, new Scalar(xmin), salidaintensidad);
+        float pendiente = ((float) 255.0) / ((float) (xmax - xmin));
+        Core.multiply(salidaintensidad, new Scalar(pendiente), salidaintensidad);
     }
 
     void pasoBajo(Mat entrada) {//Ejemplo para ser rellenada en curso
         salidatrlocal = entrada;
+    }
+
+    private void pasoAlto(Mat entrada) {
+        int filter_size = 17;
+        Size s = new Size(filter_size, filter_size);
+        Imgproc.blur(entrada, paso_bajo, s);
+// Hacer la resta. Los valores negativos saturan a cero
+        Core.subtract(paso_bajo, entrada, salidatrlocal);
+//Aplicar Ganancia para ver mejor. La multiplicacion satura
+        Scalar ganancia = new Scalar(2);
+        Core.multiply(salidatrlocal, ganancia, salidatrlocal);
+    }
+
+    private void sobel(Mat entrada) {
+        // Derivadas
+        Imgproc.Sobel(entrada, Gx, CvType.CV_32FC1, 1, 0); //Derivada primera rto x
+        Imgproc.Sobel(entrada, Gy, CvType.CV_32FC1, 0, 1); //Derivada primera rto y
+
+        // Módulo de Gradiente
+        Core.cartToPolar(Gx, Gy, salidatrlocal, AngGrad);
+
+        salidatrlocal.convertTo(salidatrlocal, CvType.CV_8UC1);
+
     }
 
     public Mat getGris() {
