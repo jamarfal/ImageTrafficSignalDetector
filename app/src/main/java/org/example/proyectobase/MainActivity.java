@@ -190,7 +190,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     @Override
     public void onResume() {
         super.onResume();
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this,
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this,
                 this);
     }
 
